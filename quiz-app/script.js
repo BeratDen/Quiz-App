@@ -42,7 +42,7 @@ Question.prototype.cevabiKontrolEt = function (cevap) {
 
 let questions = [
   new Question(
-    "Hangisi .Net paket yönetim uygulamasıdır.",
+    "1-Hangisi .Net paket yönetim uygulamasıdır.",
     {
       a: "Node.js",
       b: "Nuget",
@@ -51,7 +51,7 @@ let questions = [
     "b"
   ),
   new Question(
-    "Hangisi JavaScript paket yönetim uygulamasıdır.",
+    "2-Hangisi JavaScript paket yönetim uygulamasıdır.",
     {
       a: "Node.js",
       b: "TypeScript",
@@ -60,7 +60,7 @@ let questions = [
     "c"
   ),
   new Question(
-    "Hangisi Ruby paket yönetim uygulamasıdır.",
+    "3-Hangisi Ruby paket yönetim uygulamasıdır.",
     {
       a: "Node.js",
       b: "Nuget",
@@ -69,7 +69,7 @@ let questions = [
     "b"
   ),
   new Question(
-    "Hangisi Angular paket yönetim uygulamasıdır.",
+    "4-Hangisi Angular paket yönetim uygulamasıdır.",
     {
       a: "Node.js",
       b: "Nuget",
@@ -78,7 +78,7 @@ let questions = [
     "b"
   ),
   new Question(
-    "Hangisi Python paket yönetim uygulamasıdır.",
+    "5-Hangisi Python paket yönetim uygulamasıdır.",
     {
       a: "Node.js",
       b: "Nuget",
@@ -99,14 +99,59 @@ Quiz.prototype.getQuestion = function () {
 
 const quiz = new Quiz(questions);
 
-console.log(quiz.getQuestion());
-
 document.querySelector(".btn-start").addEventListener("click", function () {
-  if (quiz.questions.length != quiz.questionIndex) {
+  document.querySelector(".quiz_box").classList.add("active");
+  ShowQuestion(quiz.getQuestion());
+  document.querySelector(".next_btn").classList.remove("show");
+});
+document.querySelector(".next_btn").addEventListener("click", function () {
+  if (quiz.questions.length != quiz.questionIndex + 1) {
     document.querySelector(".quiz_box").classList.add("active");
-    let question = quiz.getQuestion();
     quiz.questionIndex++;
+    ShowQuestion(quiz.getQuestion());
+    document.querySelector(".next_btn").classList.remove("show");
   } else {
     console.log("quiz bitti");
   }
 });
+
+const options_list = document.querySelector(".options_list");
+const correctIcon = '<div class="icon"><i class="fas fa-check"></i></div>';
+const incorrectIcon = '<div class="icon"><i class="fas fa-times"></i></div>';
+
+function ShowQuestion(soru) {
+  let questionİnner = `<span>${soru.soruMetni}</span>`;
+  let options = "";
+  for (let anwser in soru.cevapSecenekleri) {
+    options += `
+      <div class="option">
+        <span><b>${anwser}</b>: ${soru.cevapSecenekleri[anwser]}</span>
+      </div>`;
+  }
+
+  document.querySelector(".question-text").innerHTML = questionİnner;
+  options_list.innerHTML = options;
+
+  const option = options_list.querySelectorAll(".option");
+
+  for (let opt of option) {
+    opt.setAttribute("onclick", "optionSelected(this)");
+  }
+}
+
+function optionSelected(option) {
+  let cevap = option.querySelector("span b").textContent;
+  let soru = quiz.getQuestion();
+
+  if (soru.cevabiKontrolEt(cevap)) {
+    option.classList.add("correct");
+    option.insertAdjacentHTML("beforeend", correctIcon);
+  } else {
+    option.classList.add("incorrect");
+    option.insertAdjacentHTML("beforeend", incorrectIcon);
+  }
+  for (let i = 0; i < options_list.children.length; i++) {
+    options_list.children[i].classList.add("disabled");
+  }
+  document.querySelector(".next_btn").classList.add("show");
+}
